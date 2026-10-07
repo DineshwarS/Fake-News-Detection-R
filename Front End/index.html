@@ -1,0 +1,245 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Fake News Detection System | R Machine Learning & Plumber</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <!-- Header -->
+  <header class="app-header">
+    <div class="header-container">
+      <div class="brand">
+        <div class="logo-badge">
+          <span class="logo-icon">📰</span>
+          <span class="r-badge">R</span>
+        </div>
+        <div>
+          <h1 class="brand-title">Fake News Detection System</h1>
+          <p class="brand-subtitle">Machine Learning Classification Powered by R &amp; Plumber API</p>
+        </div>
+      </div>
+      <div class="header-actions">
+        <div id="backendStatus" class="status-pill checking">
+          <span class="pulse-dot"></span>
+          <span id="statusText">Checking Backend...</span>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <!-- Main Container -->
+  <main class="main-content">
+    <div class="dashboard-grid">
+      
+      <!-- Left Column: Input & Live Prediction -->
+      <section class="card detection-card">
+        <div class="card-header">
+          <div class="card-title-group">
+            <span class="step-badge">1</span>
+            <h2>Analyze News Content</h2>
+          </div>
+          <span class="card-hint">Paste an article headline or full body</span>
+        </div>
+
+        <div class="sample-pills-bar">
+          <span class="pills-label">Quick Samples:</span>
+          <button type="button" class="sample-btn" id="loadRealSampleBtn">
+            <span class="sample-dot real"></span> Load Real News
+          </button>
+          <button type="button" class="sample-btn" id="loadFakeSampleBtn">
+            <span class="sample-dot fake"></span> Load Fake News
+          </button>
+          <button type="button" class="sample-btn clear-btn" id="clearInputBtn">
+            Clear
+          </button>
+        </div>
+
+        <div class="input-container">
+          <textarea 
+            id="newsTextInput" 
+            placeholder="Type or paste the news headline, story excerpt, or full article text here..." 
+            rows="7"
+          ></textarea>
+          <div class="input-meta">
+            <span id="charCount">0 characters</span>
+            <span id="wordCount">0 words</span>
+          </div>
+        </div>
+
+        <div class="action-bar">
+          <button id="predictBtn" class="primary-btn">
+            <span class="btn-spinner" id="btnSpinner"></span>
+            <span class="btn-icon">🔍</span>
+            <span id="btnLabel">Detect Fake News</span>
+          </button>
+        </div>
+
+        <!-- Result Box -->
+        <div id="resultBox" class="result-box hidden">
+          <div class="result-header">
+            <span class="result-sub">Model Classification Result</span>
+            <span class="result-time" id="resultTimestamp"></span>
+          </div>
+          
+          <div class="result-main">
+            <div id="verdictBadge" class="verdict-badge">
+              <span id="verdictIcon" class="verdict-icon"></span>
+              <span id="verdictLabel" class="verdict-text">--</span>
+            </div>
+            
+            <div class="confidence-display">
+              <div class="confidence-top">
+                <span class="confidence-label">Prediction Confidence</span>
+                <span id="confidenceValue" class="confidence-percentage">0%</span>
+              </div>
+              <div class="confidence-track">
+                <div id="confidenceBar" class="confidence-fill" style="width: 0%"></div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Probability Breakdown -->
+          <div class="probability-breakdown">
+            <div class="prob-item fake-prob">
+              <div class="prob-header">
+                <span>Fake Probability</span>
+                <strong id="fakeProbVal">0%</strong>
+              </div>
+              <div class="mini-track">
+                <div id="fakeProbBar" class="mini-fill fake-fill" style="width: 0%"></div>
+              </div>
+            </div>
+            <div class="prob-item real-prob">
+              <div class="prob-header">
+                <span>Real Probability</span>
+                <strong id="realProbVal">0%</strong>
+              </div>
+              <div class="mini-track">
+                <div id="realProbBar" class="mini-fill real-fill" style="width: 0%"></div>
+              </div>
+            </div>
+          </div>
+
+          <div class="result-footer">
+            <span id="analysisMeta">Preprocessed tokens: 0</span>
+          </div>
+        </div>
+      </section>
+
+      <!-- Right Column: Metrics & Confusion Matrix -->
+      <section class="card metrics-card">
+        <div class="card-header">
+          <div class="card-title-group">
+            <span class="step-badge">2</span>
+            <h2>Model Performance &amp; Evaluation</h2>
+          </div>
+          <span class="badge-tag">Test Split (20%)</span>
+        </div>
+
+        <p class="section-intro">
+          Performance metrics evaluated on an unseen test dataset split after regularized Logistic Regression training with TF-IDF vectorization:
+        </p>
+
+        <!-- Metrics Grid -->
+        <div class="metrics-grid">
+          <div class="metric-card">
+            <div class="metric-icon accuracy-icon">🎯</div>
+            <div class="metric-info">
+              <span class="metric-name">Accuracy</span>
+              <span class="metric-value" id="metricAccuracy">--%</span>
+            </div>
+          </div>
+
+          <div class="metric-card">
+            <div class="metric-icon precision-icon">🔬</div>
+            <div class="metric-info">
+              <span class="metric-name">Precision</span>
+              <span class="metric-value" id="metricPrecision">--%</span>
+            </div>
+          </div>
+
+          <div class="metric-card">
+            <div class="metric-icon recall-icon">📡</div>
+            <div class="metric-info">
+              <span class="metric-name">Recall</span>
+              <span class="metric-value" id="metricRecall">--%</span>
+            </div>
+          </div>
+
+          <div class="metric-card">
+            <div class="metric-icon f1-icon">⚖️</div>
+            <div class="metric-info">
+              <span class="metric-name">F1-Score</span>
+              <span class="metric-value" id="metricF1">--%</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Confusion Matrix Visualizer -->
+        <div class="cm-section">
+          <div class="cm-header">
+            <h3>Test Set Confusion Matrix</h3>
+            <span class="cm-sub" id="cmTotalCount">Total Evaluated: Loading...</span>
+          </div>
+
+          <div class="cm-wrapper">
+            <div class="cm-grid">
+              <div class="cm-corner"></div>
+              <div class="cm-col-label">Predicted FAKE</div>
+              <div class="cm-col-label">Predicted REAL</div>
+
+              <div class="cm-row-label">Actual FAKE</div>
+              <div class="cm-cell tp-cell">
+                <span class="cell-label">True Positive (TP)</span>
+                <span class="cell-val" id="cmTP">--</span>
+              </div>
+              <div class="cm-cell fn-cell">
+                <span class="cell-label">False Negative (FN)</span>
+                <span class="cell-val" id="cmFN">--</span>
+              </div>
+
+              <div class="cm-row-label">Actual REAL</div>
+              <div class="cm-cell fp-cell">
+                <span class="cell-label">False Positive (FP)</span>
+                <span class="cell-val" id="cmFP">--</span>
+              </div>
+              <div class="cm-cell tn-cell">
+                <span class="cell-label">True Negative (TN)</span>
+                <span class="cell-val" id="cmTN">--</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Project Description & Pipeline Summary -->
+        <div class="info-accordion">
+          <h3>📌 Project Methodology &amp; Architecture</h3>
+          <ul class="methodology-list">
+            <li><strong>Dataset:</strong> ISOT Fake &amp; Real News corpus (combining news headlines and body text).</li>
+            <li><strong>Text Preprocessing:</strong> Lowercase transformation, URL removal, wire boilerplate scrubbing, punctuation/digit removal, and standard stopword filtering.</li>
+            <li><strong>Feature Representation:</strong> Term Frequency-Inverse Document Frequency (TF-IDF) feature matrix learned strictly on training fold to prevent data leakage.</li>
+            <li><strong>Classification Model:</strong> Regularized Logistic Regression (ElasticNet via R's <code>glmnet</code>) for high-accuracy binary classification.</li>
+            <li><strong>Service API:</strong> R <code>Plumber</code> REST API exposing <code>/health</code>, <code>/predict</code>, and <code>/metrics</code>.</li>
+          </ul>
+        </div>
+      </section>
+
+    </div>
+  </main>
+
+  <!-- Footer -->
+  <footer class="app-footer">
+    <div class="footer-container">
+      <p>Fake News Detection Academic Project &bull; Built with <strong>R Software</strong>, <strong>Plumber</strong>, and <strong>Modern Web Standards</strong></p>
+      <p class="footer-endpoint">API Server: <code id="apiBaseUrlDisplay">http://127.0.0.1:8000</code></p>
+    </div>
+  </footer>
+
+  <script src="app.js"></script>
+</body>
+</html>

@@ -1,0 +1,22 @@
+{
+  "model_name": "Logistic Regression (ElasticNet via glmnet)",
+  "feature_extractor": "TF-IDF (10,000 terms)",
+  "dataset_summary": {
+    "total_samples": 39100,
+    "train_samples": 31280,
+    "test_samples": 7820,
+    "fake_count": 17903,
+    "real_count": 21197
+  },
+  "accuracy": 98.45,
+  "precision": 98.73,
+  "recall": 97.81,
+  "f1_score": 98.27,
+  "confusion_matrix": {
+    "true_positive": 3432,
+    "false_positive": 44,
+    "true_negative": 4267,
+    "false_negative": 77,
+    "total_tested": 7820
+  }
+}
